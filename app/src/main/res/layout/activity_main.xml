@@ -6,9 +6,13 @@
     android:orientation="vertical"
     tools:context="com.hemanth.makeaclick.MainActivity">
 
+    <include
+        android:id="@+id/toolbar_main"
+        layout="@layout/toolbar_main" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/recycler_grid_view"
+        android:layout_below="@id/toolbar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical">

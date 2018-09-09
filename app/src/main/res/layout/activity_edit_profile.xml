@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditProfileActivity">
+
+    <include
+        android:id="@+id/toolbar_edit_profile"
+        layout="@layout/toolbar_edit_profile" />
+
+    <EditText
+        android:id="@+id/profile_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_edit_profile"
+        android:padding="20dp"
+        android:text="@string/Home"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/wifi"
+        android:layout_width="match_parent"
+        android:layout_height="51dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/profile_name"
+        android:padding="10dp"
+        android:text="@string/Wifi"
+        android:textSize="20sp" />
+
+    <Switch
+        android:id="@+id/wifi_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="49dp"
+        android:layout_alignBottom="@+id/wifi"
+        android:layout_alignParentEnd="true"
+        android:padding="20dp"
+        android:switchMinWidth="50dp" />
+
+    <TextView
+        android:id="@+id/silent_mode"
+        android:layout_width="match_parent"
+        android:layout_height="51dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="172dp"
+        android:padding="10dp"
+        android:text="@string/Silent_Mode"
+        android:textSize="20sp" />
+
+    <Switch
+        android:id="@+id/silent_mode_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="49dp"
+        android:layout_alignBottom="@+id/silent_mode"
+        android:layout_alignParentEnd="true"
+        android:padding="20dp"
+        android:switchMinWidth="50dp" />
+
+    <TextView
+        android:id="@+id/brightness"
+        android:layout_width="match_parent"
+        android:layout_height="51dp"
+        android:layout_alignBottom="@+id/brightness_switch"
+        android:layout_alignParentStart="true"
+        android:padding="10dp"
+        android:text="@string/Brightness"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/brightness_switch"
+        android:layout_width="82dp"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/wifi_switch"
+        android:layout_below="@+id/silent_mode"
+        android:padding="20dp"
+        android:text="@string/zero_percent"
+        android:textSize="20sp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/wifi"
+        android:background="?android:attr/listDivider" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="230dp"
+        android:background="?android:attr/listDivider" />
+
+
+</RelativeLayout>

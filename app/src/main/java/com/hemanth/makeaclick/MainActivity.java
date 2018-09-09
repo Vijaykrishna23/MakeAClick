@@ -10,14 +10,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -36,72 +39,74 @@ public class MainActivity extends AppCompatActivity {
     private String On, Off, zeroPercent, fiftyPercent;
     private AudioManager audioManager;
     private WifiManager wifiManager;
-    private MyAdapter myAdapter;
+    private RecyclerGridAdapter recyclerGridAdapter;
     private RecyclerView recyclerView;
     private NotificationManager notificationManager;
-
-
+    private Values values;
+    private Button pressedProfile;
+    private Button previousPressedProfile;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar_main);
+        setSupportActionBar(toolbar);
 
         init();
         checkPermissions();
-        recyclerView.setAdapter(myAdapter);
+        values.profiles.add(new Profile(this, "HOME", true, false, String.valueOf(0)));
+        values.profiles.add(new Profile(this, "COLLEGE", false, true, String.valueOf(50)));
+        values.profiles.add(new Profile(this, "WORK", false, true, String.valueOf(50)));
+        values.profiles.add(new Profile(this, "TRAVEL", false, false, String.valueOf(50)));
+
+        //Log.d("vj",""+values.profiles.size());
+
+        recyclerView.setLayoutManager(new GridLayoutManager(this, Values.NO_OF_COLUMNS));
+        recyclerView.setAdapter(recyclerGridAdapter);
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Log.d("vj", "onClick " + position);
-                changeStateOfSwitchButton(view);
-                if (isPlaceSelected.isChecked()) {
-                    switch (position) {
-                        case 0:
-                            setWifi(true);
-                            //setAirplaneMode(false);
-                            setBrightness(0);
-                            setSilentMode(false);
-                            break;
-                        case 1:
-                            setWifi(false);
-                            //setAirplaneMode(false);
-                            setBrightness(50);
-                            setSilentMode(true);
-                            break;
-                        case 2:
-                            setWifi(false);
-                            setSilentMode(true);
-                            //setAirplaneMode(false);
-                            setBrightness(50);
-                            break;
-                        case 3:
-                            setWifi(false);
-                            setSilentMode(false);
-                            //setAirplaneMode(false);
-                            setBrightness(50);
-                            break;
-                        case 4:
-                            setWifi(false);
-                            setSilentMode(true);
-                            //setAirplaneMode(true);
-                            setBrightness(0);
-                            break;
-                    }
+
+                pressedProfile = view.findViewById(R.id.profiles);
+
+                changeColorofProfile(pressedProfile);
+                changeColorofProfile(previousPressedProfile);
+                previousPressedProfile = pressedProfile;
+
+
+                if (pressedProfile.isSelected()) {
+                    //switchCase(position);
+                    Profile.setProfile(values.profiles.get(position));
                 }
             }
 
             @Override
             public void onLongClick(View view, int position) {
                 Log.d("vj", "onLongClick " + position);
+                Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
+                //Bundle bundle = new Bundle();
+                //bundle.putSerializable("POSITION",position);
+                intent.putExtra(Values.POSITION, position);
+                startActivity(intent);
             }
         }));
+
+    }
+
+    public void changeColorofProfile(Button button) {
+        if (button.isSelected()) {
+            button.setSelected(false);
+        } else {
+            button.setSelected(true);
+        }
 
 
     }
 
 
     private void changeStateOfSwitchButton(View view) {
-        isPlaceSelected = view.findViewById(R.id.switch_button);
+        isPlaceSelected = view.findViewById(R.id.wifi_switch);
         if (!isPlaceSelected.isChecked()) {
             isPlaceSelected.setChecked(true);
         } else {
@@ -123,10 +128,12 @@ public class MainActivity extends AppCompatActivity {
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        myAdapter = new MyAdapter(this);
-        recyclerView = findViewById(R.id.recycler_view);
+        recyclerGridAdapter = new RecyclerGridAdapter(this);
+        recyclerView = findViewById(R.id.recycler_grid_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
+        values = new Values(this);
+        previousPressedProfile = new Button(this);
     }
 
     public void checkPermissions() {
@@ -144,8 +151,44 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+
     }
 
+    public void switchCase(int position) {
+        switch (position) {
+            case 0:
+                setWifi(true);
+                //setAirplaneMode(false);
+                setBrightness(0);
+                setSilentMode(false);
+                break;
+            case 1:
+                setWifi(false);
+                //setAirplaneMode(false);
+                setBrightness(50);
+                setSilentMode(true);
+                break;
+            case 2:
+                setWifi(false);
+                setSilentMode(true);
+                //setAirplaneMode(false);
+                setBrightness(50);
+                break;
+            case 3:
+                setWifi(false);
+                setSilentMode(false);
+                //setAirplaneMode(false);
+                setBrightness(50);
+                break;
+            case 4:
+                setWifi(false);
+                setSilentMode(true);
+                //setAirplaneMode(true);
+                setBrightness(0);
+                break;
+        }
+
+    }
 
     public void setWifi(boolean ON_OR_OFF) {
         if (ON_OR_OFF) {
@@ -190,6 +233,13 @@ public class MainActivity extends AppCompatActivity {
             lp.screenBrightness = 127 / 100.0f;
             getWindow().setAttributes(lp);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        return true;
     }
 
     public static interface ClickListener {
@@ -250,6 +300,5 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
 }
 
