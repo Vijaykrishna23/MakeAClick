@@ -36,7 +36,6 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-        values = new Values(getApplicationContext());
         Toolbar toolbar = findViewById(R.id.toolbar_edit_profile);
         setSupportActionBar(toolbar);
         name = findViewById(R.id.profile_name);
@@ -54,17 +53,12 @@ public class EditProfileActivity extends AppCompatActivity {
         });
 
         position = getIntent().getIntExtra(Values.POSITION, 5);
-        //Values.getProfiles() = (List<Profile>) getIntent().getBundleExtra("BUNDLE").getSerializable("Values.getProfiles()");
-        //Log.d("vj", "size " + Values.getProfiles().size());
-        //values.profileTextView.get(position) = values.profileTextView.get(position);
-
-        //Values.getProfiles().get(position).printProfile(Values.getProfiles().get(position));
 
 
-        name.setText(values.getProfiles().get(position).getProfileName());
-        wifi.setChecked(values.getProfiles().get(position).isWifiState());
-        silentMode.setChecked(values.getProfiles().get(position).isSilentModeState());
-        brightness.setText(values.getProfiles().get(position).getBrightnessPercent());
+        name.setText(Values.getProfiles().get(position).getProfileName());
+        wifi.setChecked(Values.getProfiles().get(position).isWifiState());
+        silentMode.setChecked(Values.getProfiles().get(position).isSilentModeState());
+        brightness.setText(Values.getProfiles().get(position).getBrightnessPercent());
 
         tempName = name.getText().toString();
         tempWifi = wifi.isChecked();
@@ -85,6 +79,7 @@ public class EditProfileActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
 
                 tempName = s.toString();
+
             }
         });
 
@@ -139,22 +134,17 @@ public class EditProfileActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save:
-                values.getProfiles().get(position).setWifiState(tempWifi);
-                values.getProfiles().get(position).setProfileName(tempName);
-                values.getProfiles().get(position).setSilentModeState(tempSilentMode);
-                values.getProfiles().get(position).setBrightnessPercent(tempBrightness);
+                Values.getProfiles().get(position).setWifiState(tempWifi);
+                Values.getProfiles().get(position).setProfileName(tempName);
+                Values.getProfiles().get(position).setSilentModeState(tempSilentMode);
+                Values.getProfiles().get(position).setBrightnessPercent(tempBrightness);
 
-
-                //values.profileTextView.get(position).profileName = tempName;
-                //values.profileTextView.get(position).wifiState = tempWifi;
-                //values.profileTextView.get(position).silentModeState = tempSilentMode;
-                //values.profileTextView.get(position).brightnessPercent = tempBrightness;
-                values.getProfiles().get(position).printProfile(values.getProfiles().get(position));
-                SharedPreferences sharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE);
+                //Values.getProfiles().get(position).printProfile(Values.getProfiles().get(position));
+                SharedPreferences sharedPreferences = getSharedPreferences(Values.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 Gson gson = new Gson();
                 String json = gson.toJson(Values.getProfiles());
-                editor.putString("profiles", json);
+                editor.putString(Values.PROFILES, json);
                 editor.apply();
                 //values.home.printProfile(values.home);
                 break;
