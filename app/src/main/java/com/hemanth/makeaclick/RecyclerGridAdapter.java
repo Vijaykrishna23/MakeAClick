@@ -1,7 +1,8 @@
 package com.hemanth.makeaclick;
 
-import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +11,13 @@ import android.widget.TextView;
 public class RecyclerGridAdapter extends RecyclerView.Adapter<RecyclerGridAdapter.MyViewHolder> {
 
     Values values;
-    TextView profiles;
+    TextView profileTextView;
     LayoutInflater inflater;
 
-    RecyclerGridAdapter(Activity activity) {
-        inflater = LayoutInflater.from(activity);
-        values = new Values(activity);
+    RecyclerGridAdapter(Context context) {
+        inflater = LayoutInflater.from(context);
+        values = new Values(context);
+        Log.d("vj", "adapter profiles size:" + values.getProfiles().size());
 
     }
 
@@ -30,13 +32,13 @@ public class RecyclerGridAdapter extends RecyclerView.Adapter<RecyclerGridAdapte
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        profiles.setText(values.profiles.get(position).profileName);
+        profileTextView.setText(values.getProfiles().get(position).getProfileName());
     }
 
 
     @Override
     public int getItemCount() {
-        return values.profiles.size();
+        return values.getProfiles().size();
     }
 
 
@@ -44,7 +46,7 @@ public class RecyclerGridAdapter extends RecyclerView.Adapter<RecyclerGridAdapte
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            profiles = itemView.findViewById(R.id.profiles);
+            profileTextView = itemView.findViewById(R.id.profiles);
 
         }
     }

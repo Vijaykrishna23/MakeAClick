@@ -5,6 +5,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.WindowManager;
 
 import static android.content.Context.AUDIO_SERVICE;
@@ -12,25 +13,57 @@ import static android.content.Context.WIFI_SERVICE;
 
 public class Profile {
 
-    String profileName;
-    boolean wifiState;
-    boolean silentMode;
-    String brightnessPercent;
-    Context context;
+    private String profileName;
+    private boolean wifiState;
+    private boolean silentModeState;
+    private String brightnessPercent;
+    private transient Context context;
 
 
     Profile(Context context, String profileName, boolean wifiState, boolean silentMode, String brightnessPercent) {
         this.profileName = profileName;
         this.wifiState = wifiState;
-        this.silentMode = silentMode;
+        this.silentModeState = silentMode;
         this.brightnessPercent = brightnessPercent;
         this.context = context;
     }
 
-    public static void setProfile(Profile profile) {
-        profile.setWifi(profile.wifiState);
-        profile.setSilentMode(profile.silentMode);
-        profile.setBrightness(profile.brightnessPercent);
+    public String getProfileName() {
+        return profileName;
+    }
+
+    public void setProfileName(String name) {
+        this.profileName = name;
+    }
+
+    public String getBrightnessPercent() {
+        return brightnessPercent;
+    }
+
+    public void setBrightnessPercent(String brightnessPercent) {
+        this.brightnessPercent = brightnessPercent;
+    }
+
+    public boolean isWifiState() {
+        return wifiState;
+    }
+
+    public void setWifiState(boolean wifiState) {
+        this.wifiState = wifiState;
+    }
+
+    public boolean isSilentModeState() {
+        return silentModeState;
+    }
+
+    public void setSilentModeState(boolean silentModeState) {
+        this.silentModeState = silentModeState;
+    }
+
+    public void setProfile() {
+        setWifi(wifiState);
+        setSilentMode(silentModeState);
+        setBrightness(brightnessPercent);
     }
 
     private void setWifi(boolean ON_OR_OFF) {
@@ -47,7 +80,7 @@ public class Profile {
             audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
     }
 
-    private void setBrightness(String percent) {
+    public void setBrightness(String percent) {
         WindowManager.LayoutParams lp = ((Activity) context).getWindow().getAttributes();
         //Settings.System.putInt(getContentResolver(),Settings.System.SCREEN_BRIGHTNESS_MODE,Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
         if ((Integer.parseInt(percent) == 0)) {
@@ -59,6 +92,13 @@ public class Profile {
             lp.screenBrightness = Float.parseFloat(percent) / 100.0f;
             ((Activity) context).getWindow().setAttributes(lp);
         }
+    }
+
+    public void printProfile(Profile profile) {
+        Log.d("vj", "\nProfileName: " + profileName);
+        Log.d("vj", "\nWifi: " + wifiState);
+        Log.d("vj", "\nSilentMode: " + silentModeState);
+        Log.d("vj", "\nBrightness:" + brightnessPercent);
     }
 
 }

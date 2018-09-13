@@ -14,6 +14,8 @@ import java.util.List;
 public class Values {
     final static String POSITION = "POSITION";
     final static int NO_OF_COLUMNS = 2;
+    static List<Profile> profiles = new ArrayList<>();
+    Context context;
     String On;
     String Off;
     String zeroPercent;
@@ -24,11 +26,13 @@ public class Values {
     int colorPrimary;
     int colorPrimaryLight;
     Drawable textViewBackgroundPressed;
-    List<Profile> profiles = new ArrayList<>(0);
+    Profile college;
+
 
     Drawable textViewBackgroundNotPressed;
 
     Values(Context context) {
+        this.context = context;
         placesNames = Arrays.asList(context.getResources().getStringArray(R.array.places));
         featureNames = context.getResources().getStringArray(R.array.features);
         colorPrimary = context.getResources().getColor(R.color.colorPrimary);
@@ -39,10 +43,19 @@ public class Values {
         Off = context.getResources().getString(R.string.Off);
         zeroPercent = context.getResources().getString(R.string.zero_percent);
         fiftyPercent = context.getResources().getString(R.string.fifty_percent);
-        profiles.add(new Profile(context, "HOME", true, false, String.valueOf(0)));
-        profiles.add(new Profile(context, "COLLEGE", false, true, String.valueOf(50)));
-        profiles.add(new Profile(context, "WORK", false, true, String.valueOf(50)));
-        profiles.add(new Profile(context, "TRAVEL", false, false, String.valueOf(50)));
+        //college = new Profile(context, "COLLEGE", false, true, String.valueOf(50));
+        //profiles.add(college);
+        //profileTextView.add(new Profile(context, "HOME", true, false, String.valueOf(0)));
+        //profileTextView.add(new Profile(context, "COLLEGE", false, true, String.valueOf(50)));
+        //profileTextView.add(new Profile(context, "WORK", false, true, String.valueOf(50)));
+        //profileTextView.add(new Profile(context, "TRAVEL", false, false, String.valueOf(50)));
     }
 
+    public static List<Profile> getProfiles() {
+        return profiles;
+    }
+
+    public static void setProfiles(List<Profile> profiles) {
+        Values.profiles = profiles;
+    }
 }

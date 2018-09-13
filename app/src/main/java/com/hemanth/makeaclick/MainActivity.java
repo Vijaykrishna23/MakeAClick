@@ -3,6 +3,7 @@ package com.hemanth.makeaclick;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -19,11 +19,16 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,21 +50,46 @@ public class MainActivity extends AppCompatActivity {
     private Values values;
     private Button pressedProfile;
     private Button previousPressedProfile;
+
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
+        //profiles.add(new Profile(this,"college",false,true,"50"));
+        values = new Values(this);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("prefs", 0);
+        boolean firstRun = sharedPreferences.getBoolean("firstRun", true);
+        if (firstRun) {
+            addProfiles();
+            //Log.d("vj", "size:" + values.profiles.size());
+            //Log.d("vj", "name0" + values.profiles.get(0).profileName);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("firstRun", false);
+            Gson gson = new Gson();
+            //Profile hom = new Profile(this,"home",false,false,"20");
+            String json = gson.toJson(values.getProfiles());
+            editor.putString("profiles", json);
+            editor.apply();
+            //Log.d("vj","json:" + json );
+        } else {
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("profiles", "yes");
+            Type type = new TypeToken<List<Profile>>() {
+            }.getType();
+            Values.setProfiles((List<Profile>) gson.fromJson(json, type));
+            //SharedPreferences.Editor editor = sharedPreferences.edit();
+            //Log.d("vj","json: "+ json + " gson: " + gson.fromJson(json,type));
+        }
+
 
         init();
         checkPermissions();
-        values.profiles.add(new Profile(this, "HOME", true, false, String.valueOf(0)));
-        values.profiles.add(new Profile(this, "COLLEGE", false, true, String.valueOf(50)));
-        values.profiles.add(new Profile(this, "WORK", false, true, String.valueOf(50)));
-        values.profiles.add(new Profile(this, "TRAVEL", false, false, String.valueOf(50)));
 
-        //Log.d("vj",""+values.profiles.size());
+        //Log.d("vj",""+values.profileTextView.size());
 
         recyclerView.setLayoutManager(new GridLayoutManager(this, Values.NO_OF_COLUMNS));
         recyclerView.setAdapter(recyclerGridAdapter);
@@ -77,7 +107,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if (pressedProfile.isSelected()) {
                     //switchCase(position);
-                    Profile.setProfile(values.profiles.get(position));
+                    values.getProfiles().get(position).setProfile();
+
                 }
             }
 
@@ -88,9 +119,21 @@ public class MainActivity extends AppCompatActivity {
                 //Bundle bundle = new Bundle();
                 //bundle.putSerializable("POSITION",position);
                 intent.putExtra(Values.POSITION, position);
+                Bundle args = new Bundle();
+                //args.putSerializable("PROFILES", (Serializable) profiles);
+                //intent.putExtra("BUNDLE",args);
                 startActivity(intent);
             }
         }));
+
+
+    }
+
+    private void addProfiles() {
+        values.getProfiles().add(new Profile(this, "HOME", true, false, String.valueOf(0)));
+        values.getProfiles().add(new Profile(this, "COLLEGE", false, true, String.valueOf(50)));
+        values.getProfiles().add(new Profile(this, "WORK", false, true, String.valueOf(50)));
+        values.getProfiles().add(new Profile(this, "TRAVEL", false, false, String.valueOf(50)));
 
     }
 
@@ -120,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         //placesList = findViewById(R.id.titles_list_view);
         placesNames = getResources().getStringArray(R.array.places);
         featureNames = getResources().getStringArray(R.array.features);
-        //silentMode = view.findViewById(R.id.silent_mode_feature);
+        //silentModeState = view.findViewById(R.id.silent_mode_feature);
         On = getResources().getString(R.string.On);
         Off = getResources().getString(R.string.Off);
         zeroPercent = getResources().getString(R.string.zero_percent);
@@ -130,9 +173,7 @@ public class MainActivity extends AppCompatActivity {
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         recyclerGridAdapter = new RecyclerGridAdapter(this);
         recyclerView = findViewById(R.id.recycler_grid_view);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        values = new Values(this);
+
         previousPressedProfile = new Button(this);
     }
 
@@ -154,86 +195,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void switchCase(int position) {
-        switch (position) {
-            case 0:
-                setWifi(true);
-                //setAirplaneMode(false);
-                setBrightness(0);
-                setSilentMode(false);
-                break;
-            case 1:
-                setWifi(false);
-                //setAirplaneMode(false);
-                setBrightness(50);
-                setSilentMode(true);
-                break;
-            case 2:
-                setWifi(false);
-                setSilentMode(true);
-                //setAirplaneMode(false);
-                setBrightness(50);
-                break;
-            case 3:
-                setWifi(false);
-                setSilentMode(false);
-                //setAirplaneMode(false);
-                setBrightness(50);
-                break;
-            case 4:
-                setWifi(false);
-                setSilentMode(true);
-                //setAirplaneMode(true);
-                setBrightness(0);
-                break;
-        }
-
-    }
-
-    public void setWifi(boolean ON_OR_OFF) {
-        if (ON_OR_OFF) {
-            wifiManager.setWifiEnabled(true);
-        } else {
-            wifiManager.setWifiEnabled(false);
-        }
-    }
-
-    public void setSilentMode(boolean ON_OR_OFF) {
-        if (ON_OR_OFF) {
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-        } else {
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        }
-    }
-
-   /* public void setAirplaneMode(boolean ON_OR_OFF) {
-
-        boolean isEnabled = Settings.System.getInt(getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) == 1;
-        //Log.d("vj", "airplane mode " + isEnabled);
-        // if (ON_OR_OFF) {
-        Settings.System.putInt(getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, isEnabled ? 0 : 1);
-        Log.d("vj", "airplane mode " + isEnabled);
-        Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
-        //  intent.putExtra("state",!isEnabled);
-        // this.sendBroadcast(intent);
-        //} else {
-        //    Settings.System.putInt(getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, isEnabled ?0 : 1);
-        //}
-    }*/
-
-    public void setBrightness(int percent) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        //Settings.System.putInt(getContentResolver(),Settings.System.SCREEN_BRIGHTNESS_MODE,Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-        if (percent == 0) {
-            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 1);
-            lp.screenBrightness = 1 / 100.0f;
-            getWindow().setAttributes(lp);
-        } else {
-            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 127);
-            lp.screenBrightness = 127 / 100.0f;
-            getWindow().setAttributes(lp);
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -241,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+
 
     public static interface ClickListener {
         public void onClick(View view, int position);
@@ -300,5 +262,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
 }
 
